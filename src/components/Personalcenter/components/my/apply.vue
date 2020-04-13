@@ -1,7 +1,7 @@
 <template>
     <el-tabs type="border-card">
-        <el-tab-pane label="教师申请表" class="ApplyBox" >
-            <el-form ref="Form" class="ApplyForm" status-icon aria-autocomplete="no" :model="Form" :rules="rules" label-width="1.4rem">
+        <el-tab-pane label="教师申请表" class="ApplyBox">
+            <el-form ref="Form" class="ApplyForm" status-icon aria-autocomplete="no" :model="Form" :rules="rules" label-width="1.4rem" size="mini">
             <div class="Apply_title">申请成为教师</div>
             <el-form-item prop="name" label="专家姓名">
                 <el-input  v-model="Form.name"></el-input>
@@ -21,8 +21,38 @@
             <el-form-item prop="subject" label="擅长领域/学科">
                 <el-input  v-model="Form.subject"></el-input>
             </el-form-item>
-            <el-form-item prop="address" label="所在区域">
-              
+            <!-- <el-form-item prop="address" label="所在区域">
+                
+                <el-input  v-model="Form.address"></el-input>
+            </el-form-item> -->
+             <el-form-item prop="address" label="所在区域">
+                <el-select v-model="Form.province" placeholder="请选择"  style="width:1.5rem" >
+                <el-option
+                    v-for="item in province"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                ></el-option>
+                </el-select>
+                <el-select v-model="Form.city" placeholder="请选择"  style="width:1.5rem ;margin-left:.1rem">
+                <el-option
+                    v-for="item in cites"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                ></el-option>
+                </el-select>
+                <el-select v-model="Form.county" placeholder="请选择"  style="width:1.5rem ;margin-left:.1rem">
+                <el-option
+                    v-for="item in countes"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                ></el-option>
+                </el-select>
+                
+            </el-form-item>
+            <el-form-item label="详细地址" prop="address">
                 <el-input  v-model="Form.address"></el-input>
             </el-form-item>
             <el-form-item prop="mechanism" label="所属机构">
@@ -118,7 +148,7 @@
 </template>
 
 <script>
-
+import addressData from '@/components/address-data.js'
 export default {
     name:'apply',
     components: { 
@@ -135,6 +165,9 @@ export default {
                 phone:'',
                 age:'',
                 subject:'',
+                province:null,//省份
+                city:null,//城市
+                county:null,
                 address:'',
                 mechanism:'',
                 con:'',
@@ -142,6 +175,7 @@ export default {
                 IdCardImageUrl:[],
                 CateImageUrl:[],
             },
+            province:Object.keys(addressData),
             mList: ['机构1', '机构2', '机构3', '机构4'],
             rules:{
                 name:[
@@ -197,15 +231,15 @@ export default {
     },
     methods:{
         handleLogin() {
-            // this.$refs.Form.validate(valid => {
-            //     if (valid) {
-            //         console.log(this.Form)
-            //     } else {
-            //         console.log('error submit!!');
-            //         return false;
-            //     }
-            // })
-            this.$router.push('/education/personalcenter/audit')
+            this.$refs.Form.validate(valid => {
+                if (valid) {
+                    console.log(this.Form)
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            })
+            // this.$router.push('/education/personalcenter/audit')
             // this.$refs.Form.validate(isOk => {s
                 
             //     if (isOk) {
@@ -261,7 +295,29 @@ export default {
             console.log(file.url)
             this.Form.CateImageUrl.push(file.url)
         }
+    },
+    computed: {
+    // 城市
+    cites () {
+      const province = this.Form.province
+      let data = []
+      if (province) {
+        data = Object.keys(addressData[province])
+      }
+      return   data
+    },
+    // 县城
+    countes () {
+      const city = this.Form.city
+      const province = this.Form.province
+      let data = []
+
+      if (city) {
+        data = addressData[province][city]
+      }
+      return data
     }
+  }
 }
 </script>
 
@@ -273,7 +329,7 @@ export default {
         justify-content: center;
     }
     .ApplyForm {
-        width: 60%;
+        width: 68%;
     }
     .ApplyForm .Apply_title {
         text-align: center;
